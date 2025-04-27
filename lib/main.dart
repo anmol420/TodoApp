@@ -1,4 +1,5 @@
 import 'package:todoapp/pages/home_page.dart';
+import 'package:todoapp/pages/quicktodo_page.dart';
 import 'package:todoapp/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     if (token != null) {
       return const HomePage();
     } else {
-      return const RegisterPage();
+      return const QuicktodoPage();
     }
   }
 
