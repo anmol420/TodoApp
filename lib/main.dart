@@ -1,6 +1,5 @@
 import 'package:todoapp/pages/home_page.dart';
 import 'package:todoapp/pages/quicktodo_page.dart';
-import 'package:todoapp/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
