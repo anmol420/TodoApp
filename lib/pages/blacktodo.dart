@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todoapp/components/bottom_navigation.dart';
 import 'package:todoapp/components/hamburger.dart';
+import 'package:todoapp/pages/category_todo.dart';
 
 class Blacktodo extends StatefulWidget {
   const Blacktodo({super.key});
@@ -196,6 +197,93 @@ class _QuicktodoPageState extends State<Blacktodo> {
     );
   }
 
+  Widget _buildQuickTodosView() {
+    final incomplete = _incompleteTodos;
+    final completed = _completedTodos;
+    return SafeArea(
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                Text(
+                  'Quick ToDo\'s',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Expanded(
+                  child: _todos.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No tasks yet!',
+                            style: TextStyle(color: Colors.white54, fontSize: 18),
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Column(
+                            children: [
+                              ReorderableListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: incomplete.length,
+                                onReorder: (oldIndex, newIndex) {
+                                  setState(() {
+                                    if (newIndex > oldIndex) newIndex -= 1;
+                                    final item = incomplete.removeAt(oldIndex);
+                                    incomplete.insert(newIndex, item);
+                                    _todos..removeWhere((t) => !t['done'])..insertAll(0, incomplete);
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final todo = incomplete[index];
+                                  return Dismissible(
+                                    key: ValueKey(todo['task']),
+                                    direction: DismissDirection.startToEnd,
+                                    onDismissed: (_) => _deleteTodo(todo),
+                                    background: Container(
+                                      padding: EdgeInsets.only(left: 20),
+                                      alignment: Alignment.centerLeft,
+                                      color: Colors.redAccent,
+                                      child: Icon(Icons.delete_outline_rounded, color: Colors.white),
+                                    ),
+                                    child: _buildTodoTile(todo, false, index),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              if (completed.isNotEmpty)
+                                ExpansionTile(
+                                  initiallyExpanded: _showCompleted,
+                                  onExpansionChanged: (expanded) {
+                                    setState(() => _showCompleted = expanded);
+                                  },
+                                  backgroundColor: Color(0xFF1E1E1E),
+                                  collapsedBackgroundColor: Color(0xFF2C2C2C),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  title: Text(
+                                    'Completed Tasks (${completed.length})',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  children: completed.asMap().entries.map(
+                                    (entry) => _buildTodoTile(entry.value, true, entry.key),
+                                  ).toList(),
+                                ),
+                            ],
+                          ),
+                        ),
+                ),
+              ],
+            ),
+    );
+  }
+
   Widget _buildTodoTile(Map<String, dynamic> todo, bool isCompletedList, int index) {
     return GestureDetector(
       onTap: () => _showEditTodoDialog(todo),
@@ -264,121 +352,57 @@ class _QuicktodoPageState extends State<Blacktodo> {
 
   @override
   Widget build(BuildContext context) {
-    final incomplete = _incompleteTodos;
-    final completed = _completedTodos;
+  
 
-    return Scaffold(
-      backgroundColor: Color(0xFF121212),
-       drawer: buildHamburgerDrawer(context),
-     appBar: AppBar(
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  iconTheme: IconThemeData(color: Colors.deepOrange),
-  centerTitle: true,
-  title: Padding(
-    padding: const EdgeInsets.only(top:8.0,bottom: 9.0),
-    child: Image.asset(
-     'lib/images/Todologo.png', // replace with your image path
-      height: 150,
-    ),
-  ),
-),
-      body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Quick ToDo\'s',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: _todos.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No tasks yet!',
-                        style: TextStyle(color: Colors.white54, fontSize: 18),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Column(
-                        children: [
-                          ReorderableListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: incomplete.length,
-                            onReorder: (oldIndex, newIndex) {
-                              setState(() {
-                                if (newIndex > oldIndex) newIndex -= 1;
-                                final item = incomplete.removeAt(oldIndex);
-                                incomplete.insert(newIndex, item);
-                                _todos..removeWhere((t) => !t['done'])..insertAll(0, incomplete);
-                              });
-                            },
-                            itemBuilder: (context, index) {
-                              final todo = incomplete[index];
-                              return Dismissible(
-                                key: ValueKey(todo['task']),
-                                direction: DismissDirection.startToEnd,
-                                onDismissed: (_) => _deleteTodo(todo),
-                                background: Container(
-                                  padding: EdgeInsets.only(left: 20),
-                                  alignment: Alignment.centerLeft,
-                                  color: Colors.redAccent,
-                                  child: Icon(Icons.delete_outline_rounded, color: Colors.white),
-                                ),
-                                child: _buildTodoTile(todo, false, index),
-                              );
-                            },
-                          ),
-                          SizedBox(height: 20),
-                          if (completed.isNotEmpty)
-                            ExpansionTile(
-                              initiallyExpanded: _showCompleted,
-                              onExpansionChanged: (expanded) {
-                                setState(() => _showCompleted = expanded);
-                              },
-                              backgroundColor: Color(0xFF1E1E1E),
-                              collapsedBackgroundColor: Color(0xFF2C2C2C),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              title: Text(
-                                'Completed Tasks (${completed.length})',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              children: completed.asMap().entries.map(
-                                (entry) => _buildTodoTile(entry.value, true, entry.key),
-                              ).toList(),
-                            ),
-                        ],
-                      ),
-                    ),
-            ),
-          ],
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Color(0xFF121212),
+         drawer: buildHamburgerDrawer(context),
+       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.deepOrange),
+        centerTitle: true,
+        title: Padding(
+      padding: const EdgeInsets.only(top:8.0,bottom: 9.0),
+      child: Image.asset(
+       'lib/images/Todologo.png', // replace with your image path
+        height: 150,
+      ),
         ),
+        bottom: TabBar(
+          indicatorColor: Colors.deepOrangeAccent,
+          labelColor: Colors.deepOrangeAccent,
+          unselectedLabelColor: Colors.white60,
+          tabs: [
+            Tab(text: 'Quick Todos'),
+            Tab(text: 'Category Todos'),
+          ],
+          ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: _showAddTodoBottomSheet,
-        child: Icon(Icons.add, color: Colors.black),
+        body: TabBarView(
+          children: [
+            _buildQuickTodosView(),
+            CategoryTodo(),
+          ],
+           
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.white,
+          onPressed: _showAddTodoBottomSheet,
+          child: Icon(Icons.add, color: Colors.black),
+        ),
+        bottomNavigationBar: buildBottomNavBar(
+          currentIndex: _currentIndex,
+           onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+           }),
+         
       ),
-      bottomNavigationBar: buildBottomNavBar(
-        currentIndex: _currentIndex,
-         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-         }),
-       
-);
+    );
 
   }
  
