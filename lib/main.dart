@@ -1,7 +1,8 @@
 import 'package:todoapp/pages/blacktodo.dart';
-import 'package:todoapp/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:todoapp/pages/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,9 +15,9 @@ class MyApp extends StatelessWidget {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     if (token != null) {
-      return const HomePage();
-    } else {
       return const Blacktodo();
+    } else {
+      return  LoginPage();
     }
   }
 

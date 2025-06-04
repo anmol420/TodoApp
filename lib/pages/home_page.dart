@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/pages/register_page.dart';
+import 'package:todoapp/pages/login_page.dart';
 import 'package:todoapp/services/api_services.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const RegisterPage()),
+        MaterialPageRoute(builder: (_) =>  LoginPage()),
         (route) => false,
       );
     }

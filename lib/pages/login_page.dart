@@ -1,7 +1,7 @@
 import 'package:todoapp/components/my_button.dart';
 import 'package:todoapp/components/my_textfield.dart';
 import 'package:todoapp/components/square_tile.dart';
-import 'package:todoapp/pages/home_page.dart';
+import 'package:todoapp/pages/blacktodo.dart';
 import 'package:todoapp/services/api_services.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/pages/register_page.dart';
@@ -21,7 +21,7 @@ class LoginPage extends StatelessWidget {
     if (error == null) {
       Navigator.pushReplacement(
         context,
-         MaterialPageRoute(builder: (context) => HomePage()),
+         MaterialPageRoute(builder: (context) => Blacktodo()),
          );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

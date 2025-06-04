@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:todoapp/pages/home_page.dart'; // Make sure this import exists
 
 Widget buildHamburgerDrawer(BuildContext context) {
   void onItemTap(String title) {
-    Navigator.pop(context);
+    Navigator.pop(context); // close drawer first
+
+    if (title == 'Settings') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$title clicked 💡'),
@@ -15,7 +25,7 @@ Widget buildHamburgerDrawer(BuildContext context) {
   }
 
   return Drawer(
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
     ),
     child: Container(
@@ -27,19 +37,19 @@ Widget buildHamburgerDrawer(BuildContext context) {
         ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
+        borderRadius: const BorderRadius.horizontal(right: Radius.circular(30)),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               TweenAnimationBuilder<double>(
-                duration: Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 800),
                 tween: Tween(begin: 0, end: 1),
                 builder: (context, value, child) {
                   return Transform.scale(
                     scale: value,
-                    child: DrawerHeader(
+                    child: const DrawerHeader(
                       decoration: BoxDecoration(
                         color: Color.fromARGB(217, 0, 0, 0),
                         borderRadius: BorderRadius.vertical(
@@ -109,13 +119,13 @@ List<Widget> _buildAnimatedListTiles(Function(String) onItemTap) {
                 leading: Icon(item['icon'], color: Colors.white),
                 title: Text(
                   item['title'],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,
                   ),
                 ),
-                trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
               ),
             ),
           ),
