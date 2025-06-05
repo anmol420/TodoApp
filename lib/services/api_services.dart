@@ -4,11 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static const String baseUrl =
-      'https://hono-todoappbackend1.onrender.com/api/v1';
+      'https://todoappbackend-dsx2.onrender.com/api/v1/users';
 
   static Future<String?> login(String email, String password) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/users/login"),
+      Uri.parse("$baseUrl/login"),
       body: jsonEncode({"email": email, "password": password}),
       headers: {"Content-Type": "application/json"},
     );
@@ -37,7 +37,7 @@ class ApiService {
     String password,
   ) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/users/register"),
+      Uri.parse("$baseUrl/register"),
       body: jsonEncode({
         "username": username,
         "email": email,
