@@ -1,51 +1,108 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoService {
   static const String baseUrl = "https://todoappbackend-dsx2.onrender.com/api/v1/todos";
 
+  // Helper to get token from SharedPreferences
+  static Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("token");
+  }
+
+  // Fetch Todos with cookie token header
   static Future<List<Map<String, dynamic>>> fetchTodos() async {
-    final response = await http.get(Uri.parse("$baseUrl/todoDashboard"));
+    final token = await _getToken();
+
+    final response = await http.get(
+      Uri.parse("$baseUrl/todoDashboard"),
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "cookie": "token=$token",
+      },
+    );
+
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(json.decode(response.body));
+      final data = jsonDecode(response.body);
+      final completed = List<Map<String, dynamic>>.from(data['data']['completedTodos']);
+      final notCompleted = List<Map<String, dynamic>>.from(data['data']['notCompletedTodos']);
+      return [...notCompleted, ...completed];
     } else {
       throw Exception("Failed to load todos");
     }
   }
 
-  static Future<void> createTodo(String title, String description) async {
+  // Create Todo
+  static Future<Map<String, dynamic>> createTodo(String title, String description) async {
+    final token = await _getToken();
+
     final response = await http.post(
       Uri.parse("$baseUrl/create"),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "cookie": "token=$token",
+      },
       body: jsonEncode({"title": title, "description": description}),
     );
-    if (response.statusCode != 201) throw Exception("Failed to create todo");
+
+    print("📡 Request: $title, $description");
+    print("🔁 Response Code: ${response.statusCode}");
+    print("📦 Body: ${response.body}");
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return data['data'];
+    } else {
+      throw Exception('Failed to create Todo');
+    }
   }
 
+  // Update Todo
   static Future<void> updateTodo(String id, String title, String description) async {
+    final token = await _getToken();
+
     final response = await http.patch(
       Uri.parse("$baseUrl/updateTodo"),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "cookie": "token=$token",
+      },
       body: jsonEncode({"id": id, "title": title, "description": description}),
     );
+
     if (response.statusCode != 200) throw Exception("Failed to update todo");
   }
 
+  // Delete Todo
   static Future<void> deleteTodo(String id) async {
+    final token = await _getToken();
+
     final response = await http.delete(
       Uri.parse("$baseUrl/deleteTodo"),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "cookie": "token=$token",
+      },
       body: jsonEncode({"id": id}),
     );
+
     if (response.statusCode != 200) throw Exception("Failed to delete todo");
   }
 
+  // Toggle Todo Status
   static Future<void> toggleTodoStatus(String id, bool isCompleted) async {
+    final token = await _getToken();
+
     final response = await http.patch(
       Uri.parse("$baseUrl/toggleStatus"),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "cookie": "token=$token",
+      },
       body: jsonEncode({"id": id, "isCompleted": isCompleted}),
     );
+
     if (response.statusCode != 200) throw Exception("Failed to toggle todo status");
   }
 }

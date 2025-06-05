@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:todoapp/components/bottom_navigation.dart';
 import 'package:todoapp/components/hamburger.dart';
 import 'package:todoapp/pages/category_todo.dart';
+import 'package:todoapp/services/todo_service.dart';
 
 class Blacktodo extends StatefulWidget {
   const Blacktodo({super.key});
@@ -18,108 +19,125 @@ class _QuicktodoPageState extends State<Blacktodo> {
   int _recentlyDeletedIndex = -1;
   int _currentIndex = 1;
 
-  void _showAddTodoBottomSheet() {
-    TextEditingController controller = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            child: Container(
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2E2E2E), Color(0xFF1C1C1C)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+void _showAddTodoBottomSheet(BuildContext context, Function(Map<String, dynamic>) onAdd) {
+  TextEditingController controller = TextEditingController();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF2E2E2E), Color(0xFF1C1C1C)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 25,
+                  offset: Offset(0, -12),
                 ),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black45,
-                    blurRadius: 25,
-                    offset: Offset(0, -12),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 5,
+                  margin: EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[700],
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 5,
-                    margin: EdgeInsets.only(bottom: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[700],
-                      borderRadius: BorderRadius.circular(10),
+                ),
+                Text(
+                  '📝 Add New Task',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Enter your task...',
+                    hintStyle: TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: Color(0xFF2C2C2C),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                  Text(
-                    '📝 Add New Task',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.close_rounded, color: Colors.redAccent),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: controller,
-                    autofocus: true,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Enter your task...',
-                      hintStyle: TextStyle(color: Colors.white54),
-                      filled: true,
-                      fillColor: Color(0xFF2C2C2C),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.close_rounded, color: Colors.redAccent),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.check_circle_rounded, color: Colors.greenAccent),
-                        onPressed: () {
-                          String task = controller.text.trim();
-                          if (task.isNotEmpty) {
-                            setState(() {
-                              _todos.insert(0, {
-                                'task': task,
-                                'done': false,
-                                'createdAt': DateTime.now(),
-                                'updatedAt': null,
-                              });
-                            });
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.check_circle_rounded, color: Colors.greenAccent),
+                      onPressed: () async {
+                        String task = controller.text.trim();
+                        if (task.isEmpty) return;
+
+                        try {
+                          final newTodo = await TodoService.createTodo(task, "");
+
+                          // Send the data back to parent widget
+                          onAdd({
+                            'id': newTodo['_id'],
+                            'task': newTodo['title'],
+                            'done': newTodo['isCompleted'] ?? false,
+                            'createdAt': DateTime.now(),
+                            'updatedAt': null,
+                          });
+
+                          if (context.mounted) Navigator.pop(context);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Failed to add task"),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
                           }
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                        }
+                      },
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
+
+
+
 
   List<Map<String, dynamic>> get _incompleteTodos => _todos.where((todo) => !todo['done']).toList();
   List<Map<String, dynamic>> get _completedTodos => _todos.where((todo) => todo['done']).toList();
@@ -388,11 +406,19 @@ class _QuicktodoPageState extends State<Blacktodo> {
           ],
            
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.white,
-          onPressed: _showAddTodoBottomSheet,
-          child: Icon(Icons.add, color: Colors.black),
-        ),
+floatingActionButton: FloatingActionButton(
+  backgroundColor: Colors.white,
+  onPressed: () {
+    _showAddTodoBottomSheet(context, (todo) {
+      setState(() {
+        _todos.insert(0, todo);
+      });
+    });
+  },
+  child: Icon(Icons.add, color: Colors.black),
+),
+
+
         bottomNavigationBar: buildBottomNavBar(
           currentIndex: _currentIndex,
            onTap: (index) {
