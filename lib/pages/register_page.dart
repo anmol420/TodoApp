@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
   } 
   
 
-  // bool showOtp = false; // 🔁 to toggle OTP section
+  bool showOtp = false; // 🔁 to toggle OTP section
 
   @override
   Widget build(BuildContext context) {
@@ -83,74 +83,74 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 25),
 
-                // Verify Email Button
-                // ElevatedButton(
-                //   onPressed: () {
-                //     setState(() {
-                //       showOtp = true; //  show OTP UI on click
-                //     });
-                //   },
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.red,
-                //     padding: const EdgeInsets.symmetric(
-                //         horizontal: 30, vertical: 12),
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(12),
-                //     ),
-                //   ),
-                //   child: const Text(
-                //     'Verify Email',
-                //     style: TextStyle(color: Colors.white, fontSize: 16),
-                //   ),
-                // ),
+                
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showOtp = true; //  show OTP UI on click
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Verify Email',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
 
-                // const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-                //  OTP UI
-                // if (showOtp) ...[
-                //   Text(
-                //     'Enter 4-digit OTP',
-                //     style: TextStyle(
-                //       color: Colors.grey[600],
-                //       fontSize: 14,
-                //       fontWeight: FontWeight.w500,
-                //     ),
-                //   ),
-                //   const SizedBox(height: 15),
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //     children: List.generate(4, (index) {
-                //       return SizedBox(
-                //         width: 50,
-                //         child: TextField(
-                //           keyboardType: TextInputType.number,
-                //           textAlign: TextAlign.center,
-                //           maxLength: 1,
-                //           style: const TextStyle(
-                //             fontSize: 20,
-                //             fontWeight: FontWeight.bold,
-                //             color: Colors.white,
-                //           ),
-                //           decoration: InputDecoration(
-                //             counterText: '',
-                //             filled: true,
-                //             fillColor: Colors.grey[900],
-                //             enabledBorder: OutlineInputBorder(
-                //               borderSide:
-                //                   const BorderSide(color: Colors.grey),
-                //               borderRadius: BorderRadius.circular(12),
-                //             ),
-                //             focusedBorder: OutlineInputBorder(
-                //               borderSide:
-                //                   const BorderSide(color: Colors.white),
-                //               borderRadius: BorderRadius.circular(12),
-                //             ),
-                //           ),
-                //         ),
-                //       );
-                //     }),
-                //   ),
-                // ],
+                 
+                if (showOtp) ...[
+                  Text(
+                    'Enter 4-digit OTP',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(4, (index) {
+                      return SizedBox(
+                        width: 50,
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          maxLength: 1,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          decoration: InputDecoration(
+                            counterText: '',
+                            filled: true,
+                            fillColor: Colors.grey[900],
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
                   const SizedBox(height: 25),
                    
           
